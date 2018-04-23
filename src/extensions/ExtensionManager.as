@@ -159,31 +159,6 @@ public class ExtensionManager {
 		}
 	}
 
-	// Retrieve all specs from all loaded extensions. Used by the translation system.
-	// Remember to load all relevant extensions before exporting translation strings!
-	public function getExtensionSpecs(warnIfMissing:Boolean):Array {
-		var missingExtensions:Array = [];
-		var specs:Array = [];
-		for (var extName:String in extensionDict) {
-			var ext:ScratchExtension = extensionDict[extName];
-			if (ext.blockSpecs.length > 0) {
-				ext.blockSpecs.forEach(
-						function (fullSpec:Array, ...ignored):void {
-							specs.push(fullSpec[1]);
-						});
-			}
-			else {
-				missingExtensions.push(extName);
-			}
-		}
-		if (warnIfMissing && missingExtensions.length > 0) {
-			DialogBox.notify(
-					'Missing block specs', 'Block specs were missing for some extensions.\n' +
-					'Please load these extensions and try again:\n' + missingExtensions.join(', '));
-		}
-		return specs;
-	}
-
 	// -----------------------------
 	// Enable/disable/reset
 	//------------------------------
@@ -239,7 +214,6 @@ public class ExtensionManager {
 			descriptor.extensionName = ext.name;
 			descriptor.blockSpecs = ext.blockSpecs;
 			descriptor.menus = ext.menus;
-			if (ext.url) descriptor.url = ext.url;
 			if(ext.port) descriptor.extensionPort = ext.port;
 			else if(ext.javascriptURL) descriptor.javascriptURL = ext.javascriptURL;
 			result.push(descriptor);
@@ -296,7 +270,7 @@ public class ExtensionManager {
 			ext = new ScratchExtension(extObj.extensionName, extObj.extensionPort);
 		ext.port = extObj.extensionPort;
 		ext.blockSpecs = extObj.blockSpecs;
-		if (extObj.url) ext.url = extObj.url;
+		if(extObj.url) ext.url = extObj.url;
 		ext.showBlocks = true;
 		ext.menus = extObj.menus;
 		ext.javascriptURL = extObj.javascriptURL;
@@ -348,7 +322,6 @@ public class ExtensionManager {
 
 			var ext:ScratchExtension = new ScratchExtension(extObj.extensionName, extObj.extensionPort || 0);
 			ext.blockSpecs = extObj.blockSpecs;
-			if (extObj.url) ext.url = extObj.url;
 			ext.showBlocks = true;
 			ext.isInternal = false;
 			ext.menus = extObj.menus;

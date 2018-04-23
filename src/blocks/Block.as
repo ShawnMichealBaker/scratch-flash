@@ -134,8 +134,6 @@ public class Block extends Sprite {
 		} else if (type == "b") {
 			base = new BlockShape(BlockShape.BooleanShape, color);
 			isReporter = true;
-			forceAsync = Scratch.app.extensionManager.shouldForceAsync(op);
-			isRequester = forceAsync;
 			indentLeft = 9;
 			indentRight = 7;
 		} else if (type == "r" || type == "R") {

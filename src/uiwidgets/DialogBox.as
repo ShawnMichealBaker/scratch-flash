@@ -131,14 +131,6 @@ public class DialogBox extends Sprite {
 		}
 	}
 
-	public function addTextWithCustomFunction(text:String, makeLabelFunc:Function):void {
-		for each (var s:String in text.split('\n')) {
-			var line:TextField = makeLabelFunc(Translator.map(s));
-			addChild(line);
-			textLines.push(line);
-		}
-	}
-
 	public function addWidget(o:DisplayObject):void {
 		widget = o;
 		addChild(o);
@@ -213,8 +205,8 @@ public class DialogBox extends Sprite {
 		buttons.push(b);
 	}
 
-	public function showOnStage(stage:Stage, center:Boolean = true, padding:Number = 0):void {
-		fixLayout(padding);
+	public function showOnStage(stage:Stage, center:Boolean = true):void {
+		fixLayout();
 		if (center) {
 			x = (stage.stageWidth - width) / 2;
 			y = (stage.stageHeight - height) / 2;
@@ -303,17 +295,16 @@ public class DialogBox extends Sprite {
 		return result;
 	}
 
-	public function fixLayout(padding:Number = 0):void {
+	public function fixLayout():void {
 		var label:TextField;
 		var i:int, totalW:int;
-		fixSize(padding);
+		fixSize();
 		var fieldX:int = maxLabelWidth + 17;
 		var fieldY:int = 15;
 		if (title != null) {
 			title.x = (w - title.width) / 2;
 			title.y = 5;
 			fieldY = title.y + title.height + 20;
-			fieldY += padding;
 		}
 		if (xButton != null) {
 			xButton.x = this.width-20;
@@ -371,14 +362,13 @@ public class DialogBox extends Sprite {
 		}
 	}
 
-	private function fixSize(padding:Number = 0):void {
+	private function fixSize():void {
 		var i:int, totalW:int;
 		w = h = 0;
 		// title
 		if (title != null) {
 			w = Math.max(w, title.width);
 			h += 10 + title.height;
-			h += padding;
 		}
 		// fields
 		maxLabelWidth = 0;

@@ -133,7 +133,7 @@ public class Server implements IServer {
 		// Re-trying here should help project save failures but we'll need to add more code to re-try loading projects
 		if (event is SecurityErrorEvent) {
 			var urlPathStart:int = url.indexOf('/', 10);
-			var policyFileURL:String = url.substr(0, urlPathStart) + '/crossdomain.xml?cb=' + Math.random();
+			var policyFileURL:String = 'http://cdn.assets.scratch.mit.edu/crossdomain.xml';//url.substr(0, urlPathStart) + '/crossdomain.xml?cb=' + Math.random();
 			Security.loadPolicyFile(policyFileURL);
 			Scratch.app.log(LogLevel.WARNING, 'Reloading policy file', {policy: policyFileURL, initiator: url});
 		}
@@ -218,22 +218,12 @@ public class Server implements IServer {
 			request.method = URLRequestMethod.POST;
 			request.data = data;
 
-			if (mimeType) request.requestHeaders.push(new URLRequestHeader("content-type", mimeType));
+			if (mimeType) request.requestHeaders.push(new URLRequestHeader("Content-type", mimeType));
 
 			// header for CSRF authentication when sending data
 			var csrfCookie:String = getCSRF();
 			if (csrfCookie && (csrfCookie.length > 0)) {
-				request.requestHeaders.push(new URLRequestHeader('x-csrftoken', csrfCookie));
-			}
-
-			if (data.length == 0) {
-				// Flash's URLLoader will convert a POST with a zero-length body into a GET; apparently there's no way
-				// to avoid that behavior.
-				// Most Scratch servers will respond to this with error 403, leading to other problems down the road.
-				// Since this situation likely means the asset is broken anyway, complain about it and skip the upload.
-				// It's better to, for example, save a project with one missing asset than to fail the save altogether.
-				onCallServerError(url, data, new ErrorEvent("Refusing to POST with empty body"));
-				return loader;
+				request.requestHeaders.push(new URLRequestHeader('X-CSRFToken', csrfCookie));
 			}
 		}
 
@@ -252,6 +242,7 @@ public class Server implements IServer {
 
 	// Make a simple GET. Uses the same callbacks as callServer().
 	public function serverGet(url:String, whenDone:Function):URLLoader {
+    //Scratch.app.log(LogLevel.WARNING, 'serverGet', url);
 		return callServer(url, null, null, whenDone);
 	}
 
@@ -263,12 +254,14 @@ public class Server implements IServer {
 //			whenDone(BackpackPart.localAssets[md5]);
 //			return null;
 //		}
-		var url:String = URLs.assetCdnPrefix + URLs.internalAPI + 'asset/' + md5 + '/get/';
+		var url:String = 'http://cdn.assets.scratch.mit.edu/internalapi/asset/' + md5 + '/get/';
+
 		return serverGet(url, whenDone);
 	}
 
 	public function getMediaLibrary(libraryType:String, whenDone:Function):URLLoader {
-		var url:String = getCdnStaticSiteURL() + 'medialibraries/' + libraryType + 'Library.json';
+		// var url:String = getCdnStaticSiteURL() + 'medialibraries/' + libraryType + 'Library.json';
+		var url:String = 'medialibraries/' + libraryType + 'Library.json';
 		return serverGet(url, whenDone);
 	}
 
@@ -315,7 +308,8 @@ public class Server implements IServer {
 	}
 
 	public function getThumbnail(idAndExt:String, w:int, h:int, whenDone:Function):URLLoader {
-		var url:String = getCdnStaticSiteURL() + 'medialibrarythumbnails/' + idAndExt;
+		// var url:String = getCdnStaticSiteURL() + 'medialibrarythumbnails/' + idAndExt;
+		var url:String = 'medialibrarythumbnails/' + idAndExt;
 		return downloadThumbnail(url, w, h, whenDone);
 	}
 
@@ -340,7 +334,7 @@ public class Server implements IServer {
 	public function setSelectedLang(lang:String):void {
 		// Record the language setting.
 		var sharedObj:SharedObject = SharedObject.getLocal('Scratch');
-		if (lang == '') lang = 'en';
+		if (lang == '') lang = 'zh-cn';
 		sharedObj.data.lang = lang;
 		sharedObj.flush();
 	}

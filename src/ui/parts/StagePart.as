@@ -134,8 +134,8 @@ public class StagePart extends UIPart {
 	public function setProjectName(s:String):void { projectTitle.setContents(s) }
 	public function isInPresentationMode():Boolean { return fullscreenButton.visible && fullscreenButton.isOn() }
 
-	public function presentationModeWasChanged(isPresentationMode:Boolean):void {
-		fullscreenButton.setOn(isPresentationMode);
+	public function exitPresentationMode():void {
+		fullscreenButton.setOn(false);
 		drawOutline();
 		refresh();
 	}
@@ -435,7 +435,7 @@ public class StagePart extends UIPart {
 
 	private function addFullScreenButton():void {
 		function toggleFullscreen(b:IconButton):void {
-			app.presentationModeWasChanged(b.isOn());
+			app.setPresentationMode(b.isOn());
 			drawOutline();
 		}
 		fullscreenButton = new IconButton(toggleFullscreen, 'fullscreen');

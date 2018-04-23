@@ -69,10 +69,11 @@ public class TopBarPart extends UIPart {
 		addChild(shape = new Shape());
 		addChild(languageButton = new IconButton(app.setLanguagePressed, 'languageButton'));
 		languageButton.isMomentary = true;
+		//Scratch.app.externalCall('console.log',null,languageButton);
 		addTextButtons();
 		addToolButtons();
-		if (Scratch.app.isExtensionDevMode) {
-			addChild(logoButton = new IconButton(app.logoButtonPressed, Resources.createBmp('scratchxlogo')));
+		//if (Scratch.app.isExtensionDevMode) {
+			addChild(logoButton = new IconButton(app.logoButtonPressed, Resources.createBmp('mylogo')));
 			const desiredButtonHeight:Number = 20;
 			logoButton.scaleX = logoButton.scaleY = 1;
 			var scale:Number = desiredButtonHeight / logoButton.height;
@@ -85,7 +86,7 @@ public class TopBarPart extends UIPart {
 			if (extensionDevManager) {
 				addChild(loadExperimentalButton = extensionDevManager.makeLoadExperimentalExtensionButton());
 			}
-		}
+		//}
 	}
 
 	public static function strings():Array {

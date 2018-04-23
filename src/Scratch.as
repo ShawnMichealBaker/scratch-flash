@@ -39,7 +39,6 @@ import flash.net.FileFilter;
 import flash.net.FileReference;
 import flash.net.FileReferenceList;
 import flash.net.LocalConnection;
-import flash.net.SharedObject;
 import flash.net.URLLoader;
 import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
@@ -75,7 +74,7 @@ import watchers.ListWatcher;
 
 public class Scratch extends Sprite {
 	// Version
-	public static const versionString:String = 'v460';
+	public static const versionString:String = 'v448';
 	public static var app:Scratch; // static reference to the app, used for debugging
 
 	// Display modes
@@ -93,7 +92,7 @@ public class Scratch extends Sprite {
 	public var isMicroworld:Boolean = false;
 
 	public var presentationScale:Number;
-	
+
 	// Runtime
 	public var runtime:ScratchRuntime;
 	public var interp:Interpreter;
@@ -163,7 +162,7 @@ public class Scratch extends Sprite {
 	}
 
 	protected function initialize():void {
-		isOffline = !URLUtil.isHttpURL(loaderInfo.url);
+		isOffline = true;//!URLUtil.isHttpURL(loaderInfo.url);
 		hostProtocol = URLUtil.getProtocol(loaderInfo.url);
 
 		isExtensionDevMode = (loaderInfo.parameters['extensionDevMode'] == 'true');
@@ -621,24 +620,14 @@ public class Scratch extends Sprite {
 	}
 
 	public function setProjectName(s:String):void {
-		for (;;) {
-			if (StringUtil.endsWith(s, '.sb')) s = s.slice(0, -3);
-			else if (StringUtil.endsWith(s, '.sb2')) s = s.slice(0, -4);
-			else if (StringUtil.endsWith(s, '.sbx')) s = s.slice(0, -4);
-			else break;
-		}
+		if (s.slice(-3) == '.sb') s = s.slice(0, -3);
+		if (s.slice(-4) == '.sb2') s = s.slice(0, -4);
 		stagePart.setProjectName(s);
 	}
 
 	protected var wasEditing:Boolean;
 
 	public function setPresentationMode(enterPresentation:Boolean):void {
-		if (stagePart.isInPresentationMode() != enterPresentation) {
-			presentationModeWasChanged(enterPresentation);
-		}
-	}
-
-	public function presentationModeWasChanged(enterPresentation:Boolean):void {
 		if (enterPresentation) {
 			wasEditing = editMode;
 			if (wasEditing) {
@@ -657,7 +646,6 @@ public class Scratch extends Sprite {
 		for each (var o:ScratchObj in stagePane.allObjects()) o.applyFilters();
 
 		if (lp) fixLoadProgressLayout();
-		stagePart.presentationModeWasChanged(enterPresentation);
 		stagePane.updateCostume();
 		SCRATCH::allow3d {
 			if (isIn3D) render3D.onStageResize();
@@ -672,6 +660,7 @@ public class Scratch extends Sprite {
 		// Escape exists presentation mode.
 		else if ((evt.charCode == 27) && stagePart.isInPresentationMode()) {
 			setPresentationMode(false);
+			stagePart.exitPresentationMode();
 		}
 		// Handle enter key
 //		else if(evt.keyCode == 13 && !stage.focus) {
@@ -897,15 +886,15 @@ public class Scratch extends Sprite {
 
 		updateLayout(w, h);
 	}
-	
+
 	public function updateRecordingTools(t:Number):void {
 		stagePart.updateRecordingTools(t);
 	}
-	
+
 	public function removeRecordingTools():void {
 		stagePart.removeRecordingTools();
 	}
-	
+
 	public function refreshStagePart():void {
 		stagePart.refresh();
 	}
@@ -1021,9 +1010,10 @@ public class Scratch extends Sprite {
 	}
 
 	public function logoButtonPressed(b:IconButton):void {
-		if (isExtensionDevMode) {
-			externalCall('showPage', null, 'home');
-		}
+		//if (isExtensionDevMode) {
+			externalCall('window.showPage', null, 'home');
+			externalCall('console.log', null, 'home');
+		//}
 	}
 
 	// -----------------------------
@@ -1063,7 +1053,7 @@ public class Scratch extends Sprite {
 
 		m.showOnStage(stage, b.x, topBarPart.bottom() - 1);
 	}
-	
+
 	public function stopVideo(b:*):void {
 		runtime.stopVideo();
 	}
@@ -1143,17 +1133,15 @@ public class Scratch extends Sprite {
 				'\n\nPlease do not distribute!', stage);
 	}
 
-	protected function onNewProject():void {}
-
 	protected function createNewProjectAndThen(callback:Function = null):void {
 		function clearProject():void {
 			startNewProject('', '');
 			setProjectName('Untitled');
-			onNewProject();
 			topBarPart.refresh();
 			stagePart.refresh();
 			if (callback != null) callback();
 		}
+
 		saveProjectAndThen(clearProject);
 	}
 
