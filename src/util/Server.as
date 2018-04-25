@@ -250,12 +250,14 @@ public class Server implements IServer {
 	// Asset API
 	//------------------------------
 	public function getAsset(md5:String, whenDone:Function):URLLoader {
-//		if (BackpackPart.localAssets[md5] && BackpackPart.localAssets[md5].length > 0) {
-//			whenDone(BackpackPart.localAssets[md5]);
-//			return null;
-//		}
-		var url:String = 'http://cdn.assets.scratch.mit.edu/internalapi/asset/' + md5 + '/get/';
-
+		//		if (BackpackPart.localAssets[md5] && BackpackPart.localAssets[md5].length > 0) {
+		//			whenDone(BackpackPart.localAssets[md5]);
+		//			return null;
+		//		}
+		// 如果为了方便 可以直接请求MIT的CDN
+		//var url:String = 'http://cdn.assets.scratch.mit.edu/internalapi/asset/' + md5 + '/get/';
+		// 如果通过爬虫把资源弄到本地 或者 本地有资源 就可以直接请求本地 这样更快
+		var url:String = 'asset/' + md5;
 		return serverGet(url, whenDone);
 	}
 
